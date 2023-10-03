@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { Inject, Injectable } from '@angular/core';
-import { STAR_WARS_API_BASE_URL } from '@core/tokens/star-wars-api-base-url.token';
+import { STAR_WARS_API_BASE_URL } from '@/core/tokens/star-wars-api-base-url.token';
 import {
   StarWarsPeopleApi,
   starWarsPeopleApiSchema,

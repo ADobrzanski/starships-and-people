@@ -6,7 +6,7 @@ import { TestBed } from '@angular/core/testing';
 import { StartWarsApiService } from './star-wars-api.service';
 import { StarWarsPeopleApi } from './models/star-wars-people-api.model';
 import { StarWarsPersonApi } from './models/star-wars-person-api.model';
-import { STAR_WARS_API_BASE_URL } from '@core/tokens/star-wars-api-base-url.token';
+import { STAR_WARS_API_BASE_URL } from '@/core/tokens/star-wars-api-base-url.token';
 
 describe(StartWarsApiService.name, () => {
   const baseApiUrl = 'http://testbaseapiurl.com';

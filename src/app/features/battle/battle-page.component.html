@@ -1,0 +1,67 @@
+<button
+  mat-raised-button
+  color="accent"
+  [attr.data-testid]="'button-start-battle'"
+  (click)="initBattle()"
+>
+  Battle!
+</button>
+
+<ng-container *ngIf="battlefieldState$ | async as battlefieldState">
+  <main class="card-container">
+    <ng-container *ngIf="battlefieldState.firstOpponent as opponent">
+      <ng-container
+        *ngTemplateOutlet="opponentDetails; context: { $implicit: opponent }"
+      ></ng-container>
+    </ng-container>
+
+    <ng-container *ngIf="battlefieldState.secondOpponent as opponent">
+      <ng-container
+        *ngTemplateOutlet="opponentDetails; context: { $implicit: opponent }"
+      ></ng-container>
+    </ng-container>
+  </main>
+</ng-container>
+
+<ng-template #opponentDetails let-opponent>
+  <mat-card class="card" [attr.data-testid]="'opponent-details'">
+    <mat-card-header>
+      <mat-card-title>{{ opponent["name"] }}</mat-card-title>
+      <mat-card-subtitle>Person</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <table>
+        <tbody>
+          <tr>
+            <th scope="row">Birth year</th>
+            <td>{{ opponent["birth_year"] }}</td>
+          </tr>
+          <tr>
+            <th scope="row">Eye color</th>
+            <td>{{ opponent["eye_color"] }}</td>
+          </tr>
+          <tr>
+            <th scope="row">Gender</th>
+            <td>{{ opponent["gender"] }}</td>
+          </tr>
+          <tr>
+            <th scope="row">Hair color</th>
+            <td>{{ opponent["hair_color"] }}</td>
+          </tr>
+          <tr>
+            <th scope="row">Height</th>
+            <td>{{ opponent["height"] }}</td>
+          </tr>
+          <tr>
+            <th scope="row">Mass</th>
+            <td>{{ opponent["mass"] }}</td>
+          </tr>
+          <tr>
+            <th scope="row">Skin color</th>
+            <td>{{ opponent["skin_color"] }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </mat-card-content>
+  </mat-card>
+</ng-template>

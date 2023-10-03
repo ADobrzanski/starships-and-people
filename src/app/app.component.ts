@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
+import { BattlePageComponent } from '@/features/battle/battle-page.component';
 
 @Component({
   selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
   standalone: true,
+  imports: [BattlePageComponent],
+  template: ` <app-battle-page /> `,
 })
 export class AppComponent {}
