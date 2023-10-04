@@ -2,7 +2,7 @@ import { MockBuilder, MockInstance } from 'ng-mocks';
 import { BattleService } from './battle.service';
 import { StartWarsApiService } from '@/api/start-wars-api/star-wars-api.service';
 import { AppComponent } from '@/app.component';
-import { of, skip, take } from 'rxjs';
+import { map, of, skip, take, toArray } from 'rxjs';
 import { TestBed } from '@angular/core/testing';
 import { range } from '@/utils/range';
 import {
@@ -196,6 +196,70 @@ describe(BattleService.name, () => {
       service.battle.pipe(take(1)).subscribe((battle) => {
         expect(battle.outcome).toEqual(BattleOutcome.DRAW);
       });
+    });
+
+    it('should increment first player`s score when first opponent wins', () => {
+      const service = TestBed.inject(BattleService);
+
+      service.battle
+        .pipe(
+          take(2),
+          map((_) => _.score.firstPlayer),
+          toArray(),
+        )
+        .subscribe((scoresPerBattle) => {
+          expect(scoresPerBattle).toEqual([0, 1]);
+        });
+
+      service.fieldOpponents(heavierOpponent, lighterOpponent);
+    });
+
+    it('should not change second player`s score when first opponent wins', () => {
+      const service = TestBed.inject(BattleService);
+
+      service.battle
+        .pipe(
+          take(2),
+          map((_) => _.score.secondPlayer),
+          toArray(),
+        )
+        .subscribe((scoresPerBattle) => {
+          expect(scoresPerBattle).toEqual([0, 0]);
+        });
+
+      service.fieldOpponents(heavierOpponent, lighterOpponent);
+    });
+
+    it('should increment second player`s score when second opponent wins', () => {
+      const service = TestBed.inject(BattleService);
+
+      service.battle
+        .pipe(
+          take(2),
+          map((_) => _.score.secondPlayer),
+          toArray(),
+        )
+        .subscribe((scoresPerBattle) => {
+          expect(scoresPerBattle).toEqual([0, 1]);
+        });
+
+      service.fieldOpponents(lighterOpponent, heavierOpponent);
+    });
+
+    it('should not change first player`s score when second opponent wins', () => {
+      const service = TestBed.inject(BattleService);
+
+      service.battle
+        .pipe(
+          take(2),
+          map((_) => _.score.firstPlayer),
+          toArray(),
+        )
+        .subscribe((scoresPerBattle) => {
+          expect(scoresPerBattle).toEqual([0, 0]);
+        });
+
+      service.fieldOpponents(lighterOpponent, heavierOpponent);
     });
   });
 });

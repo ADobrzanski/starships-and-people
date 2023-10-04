@@ -10,6 +10,7 @@ import {
 } from 'rxjs';
 import { PersonDetails } from '../models/person-details.model';
 import { BattleOutcome } from '../types/battle-status.enum';
+import { exhaustiveSwitchGuard } from '@/utils/exhaustive-switch-guard';
 
 @Injectable({ providedIn: 'root' })
 export class BattleService {
@@ -42,8 +43,38 @@ export class BattleService {
     secondOpponent: undefined,
   });
 
+  private readonly score = {
+    firstPlayer: 0,
+    secondPlayer: 0,
+  };
+
   readonly battle = this.battlefield.asObservable().pipe(
     map((data) => ({ ...data, ...this.decideOutcome(data) })),
+    map((data) => {
+      switch (data.outcome) {
+        case BattleOutcome.WINNER_FOUND: {
+          if (data.winner === data.firstOpponent) {
+            this.score.firstPlayer++;
+          } else {
+            this.score.secondPlayer++;
+          }
+          break;
+        }
+        case BattleOutcome.DRAW: {
+          this.score.firstPlayer++;
+          this.score.secondPlayer++;
+          break;
+        }
+        case BattleOutcome.UNDECIDABLE: {
+          /* SCORE DOES NOT CHANGE */
+          break;
+        }
+        default: {
+          exhaustiveSwitchGuard(data.outcome);
+        }
+      }
+      return { ...data, score: this.score };
+    }),
     shareReplay(1),
   );
 

@@ -1,6 +1,14 @@
-.toolbar {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
+.scoreboard {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  padding: 16px;
+}
+
+.score {
+  font-weight: 500;
+  font-size: 32px;
+  color: grey;
 }
 
 .card-container {

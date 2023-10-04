@@ -27,6 +27,22 @@ describe(BattlePageComponent.name, () => {
       .keep(MatIconModule),
   );
 
+  beforeEach(() =>
+    MockInstance(
+      BattleService,
+      'battle',
+      of({
+        firstOpponent: undefined,
+        secondOpponent: undefined,
+        score: {
+          firstPlayer: 0,
+          secondPlayer: 0,
+        },
+        outcome: BattleOutcome.UNDECIDABLE,
+      }),
+    ),
+  );
+
   it('should create', () => {
     expect(
       MockRender(BattlePageComponent).point.componentInstance,
@@ -76,12 +92,14 @@ describe(BattlePageComponent.name, () => {
         firstOpponent: undefined,
         secondOpponent: undefined,
         outcome: BattleOutcome.UNDECIDABLE,
+        score: { firstPlayer: 0, secondPlayer: 0 },
       } as const;
 
       const nonEmptyBattlefield = {
         firstOpponent: mockOpponentDetails,
         secondOpponent: mockOpponentDetails,
         outcome: BattleOutcome.DRAW,
+        score: { firstPlayer: 0, secondPlayer: 0 },
       } as const;
 
       /* tests */
@@ -242,4 +260,48 @@ describe(BattlePageComponent.name, () => {
       );
     }),
   );
+
+  describe('scoreboard', () => {
+    it('should present first player`s score', () => {
+      const fixture = MockRender(BattlePageComponent);
+      const instance = fixture.point.componentInstance;
+
+      const score = { firstPlayer: 5, secondPlayer: 12 };
+
+      instance.battlefieldState$ = of({
+        firstOpponent: undefined,
+        secondOpponent: undefined,
+        outcome: BattleOutcome.UNDECIDABLE,
+        score,
+      });
+
+      fixture.detectChanges();
+
+      const firstPlayerScoreEl = screen.getByTestId('score-first-player');
+      expect(firstPlayerScoreEl.textContent).toContain(
+        score.firstPlayer.toString(),
+      );
+    });
+
+    it('should present second player`s score', () => {
+      const fixture = MockRender(BattlePageComponent);
+      const instance = fixture.point.componentInstance;
+
+      const score = { firstPlayer: 5, secondPlayer: 12 };
+
+      instance.battlefieldState$ = of({
+        firstOpponent: undefined,
+        secondOpponent: undefined,
+        outcome: BattleOutcome.UNDECIDABLE,
+        score,
+      });
+
+      fixture.detectChanges();
+
+      const secondPlayerScoreEl = screen.getByTestId('score-second-player');
+      expect(secondPlayerScoreEl.textContent).toContain(
+        score.secondPlayer.toString(),
+      );
+    });
+  });
 });

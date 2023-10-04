@@ -1,13 +1,21 @@
-<button
-  mat-raised-button
-  color="accent"
-  [attr.data-testid]="'button-start-battle'"
-  (click)="initBattle()"
->
-  Battle!
-</button>
-
 <ng-container *ngIf="battlefieldState$ | async as battlefieldState">
+  <div class="scoreboard">
+    <span class="score score__first-player" data-testid="score-first-player">
+      {{ battlefieldState.score.firstPlayer }}
+    </span>
+    <button
+      mat-raised-button
+      color="accent"
+      [attr.data-testid]="'button-start-battle'"
+      (click)="initBattle()"
+    >
+      Battle!
+    </button>
+    <span class="score score__second-player" data-testid="score-second-player">
+      {{ battlefieldState.score.secondPlayer }}
+    </span>
+  </div>
+
   <main class="card-container">
     <ng-container *ngIf="battlefieldState.firstOpponent as opponent">
       <ng-container
