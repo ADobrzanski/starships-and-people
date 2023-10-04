@@ -11,22 +11,41 @@
   <main class="card-container">
     <ng-container *ngIf="battlefieldState.firstOpponent as opponent">
       <ng-container
-        *ngTemplateOutlet="opponentDetails; context: { $implicit: opponent }"
+        *ngTemplateOutlet="
+          opponentDetails;
+          context: {
+            $implicit: opponent,
+            isWinner: opponent === battlefieldState.winner
+          }
+        "
       ></ng-container>
     </ng-container>
 
     <ng-container *ngIf="battlefieldState.secondOpponent as opponent">
       <ng-container
-        *ngTemplateOutlet="opponentDetails; context: { $implicit: opponent }"
+        *ngTemplateOutlet="
+          opponentDetails;
+          context: {
+            $implicit: opponent,
+            isWinner: opponent === battlefieldState.winner
+          }
+        "
       ></ng-container>
     </ng-container>
   </main>
 </ng-container>
 
-<ng-template #opponentDetails let-opponent>
-  <mat-card class="card" [attr.data-testid]="'opponent-details'">
+<ng-template #opponentDetails let-opponent let-isWinner="isWinner">
+  <mat-card
+    class="card"
+    [attr.data-testid]="'opponent-details'"
+    [appearance]="'outlined'"
+  >
     <mat-card-header>
-      <mat-card-title>{{ opponent["name"] }}</mat-card-title>
+      <mat-card-title>
+        <span *ngIf="isWinner" [attr.data-testid]="'winner-badge'">🥇</span>
+        {{ opponent["name"] }}
+      </mat-card-title>
       <mat-card-subtitle>Person</mat-card-subtitle>
     </mat-card-header>
     <mat-card-content>

@@ -8,6 +8,8 @@ import {
   shareReplay,
   tap,
 } from 'rxjs';
+import { PersonDetails } from '../models/person-details.model';
+import { BattleOutcome } from '../types/battle-status.enum';
 
 @Injectable({ providedIn: 'root' })
 export class BattleService {
@@ -26,21 +28,52 @@ export class BattleService {
       shareReplay(1),
     );
 
-  private readonly _battlefieldState$ = new BehaviorSubject<
+  private readonly battlefield = new BehaviorSubject<
     | {
         firstOpponent: undefined;
         secondOpponent: undefined;
       }
     | {
-        firstOpponent: Record<string, unknown>;
-        secondOpponent: Record<string, unknown>;
+        firstOpponent: PersonDetails;
+        secondOpponent: PersonDetails;
       }
   >({
     firstOpponent: undefined,
     secondOpponent: undefined,
   });
 
-  readonly battlefieldState$ = this._battlefieldState$.asObservable();
+  readonly battle = this.battlefield.asObservable().pipe(
+    map((data) => ({ ...data, ...this.decideOutcome(data) })),
+    shareReplay(1),
+  );
+
+  private decideOutcome(battlefield: {
+    firstOpponent?: PersonDetails;
+    secondOpponent?: PersonDetails;
+  }): { outcome: BattleOutcome; winner?: PersonDetails } {
+    const { firstOpponent, secondOpponent } = battlefield;
+
+    if (!firstOpponent || !secondOpponent)
+      return { outcome: BattleOutcome.UNDECIDABLE };
+
+    const firstOpponentScore = Number(firstOpponent.mass);
+    const secondOpponentScore = Number(secondOpponent.mass);
+
+    if (isNaN(firstOpponentScore) || isNaN(secondOpponentScore))
+      return { outcome: BattleOutcome.UNDECIDABLE };
+
+    if (firstOpponentScore > secondOpponentScore) {
+      return { outcome: BattleOutcome.WINNER_FOUND, winner: firstOpponent };
+    } else if (firstOpponentScore < secondOpponentScore) {
+      return { outcome: BattleOutcome.WINNER_FOUND, winner: secondOpponent };
+    } else {
+      return { outcome: BattleOutcome.DRAW };
+    }
+  }
+
+  fieldOpponents(firstOpponent: PersonDetails, secondOpponent: PersonDetails) {
+    this.battlefield.next({ firstOpponent, secondOpponent });
+  }
 
   initBattle() {
     this.allCharacters
@@ -59,7 +92,9 @@ export class BattleService {
             secondOpponent: getRandomCharacterDetails(),
           });
         }),
-        tap((data) => this._battlefieldState$.next(data)),
+        tap((data) =>
+          this.fieldOpponents(data.firstOpponent, data.secondOpponent),
+        ),
       )
       .subscribe();
   }

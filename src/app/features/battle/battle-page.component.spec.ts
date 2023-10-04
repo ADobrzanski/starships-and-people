@@ -6,7 +6,15 @@ import { of } from 'rxjs';
 import { PersonDetails } from './models/person-details.model';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
-import { screen, getByText, getByRole } from '@testing-library/dom';
+import { MatIconModule } from '@angular/material/icon';
+import {
+  screen,
+  getByText,
+  getByRole,
+  getByTestId,
+  queryAllByTestId,
+} from '@testing-library/dom';
+import { BattleOutcome } from './types/battle-status.enum';
 
 describe(BattlePageComponent.name, () => {
   MockInstance.scope();
@@ -15,7 +23,8 @@ describe(BattlePageComponent.name, () => {
     MockBuilder(BattlePageComponent)
       .mock(BattleService, { export: true })
       .keep(MatCardModule)
-      .keep(MatButtonModule),
+      .keep(MatButtonModule)
+      .keep(MatIconModule),
   );
 
   it('should create', () => {
@@ -50,17 +59,9 @@ describe(BattlePageComponent.name, () => {
 
   opponentsTestCases.forEach((testCase) =>
     describe(testCase.name, () => {
-      const emptyBattlefield = {
-        firstOpponent: undefined,
-        secondOpponent: undefined,
-      };
+      /* mock data */
 
-      const nonEmptyBattlefield = {
-        firstOpponent: { name: 'someOpponent' },
-        secondOpponent: { name: 'someOtherOpponent' },
-      };
-
-      const opponentDetails = {
+      const mockOpponentDetails = {
         birth_year: '19 BBY',
         eye_color: 'Blue',
         gender: 'Male',
@@ -71,9 +72,24 @@ describe(BattlePageComponent.name, () => {
         skin_color: 'Fair',
       } satisfies PersonDetails;
 
+      const emptyBattlefield = {
+        firstOpponent: undefined,
+        secondOpponent: undefined,
+        outcome: BattleOutcome.UNDECIDABLE,
+      } as const;
+
+      const nonEmptyBattlefield = {
+        firstOpponent: mockOpponentDetails,
+        secondOpponent: mockOpponentDetails,
+        outcome: BattleOutcome.DRAW,
+      } as const;
+
+      /* tests */
+
       it('should get rendered when there are opponents on the battlefield', () => {
         const fixture = MockRender(BattlePageComponent);
         const instance = fixture.point.componentInstance;
+        const opponentDetails = { ...mockOpponentDetails, name: 'Tested' };
 
         instance.battlefieldState$ = of({
           ...nonEmptyBattlefield,
@@ -101,6 +117,7 @@ describe(BattlePageComponent.name, () => {
       it('should show opponent`s name', async () => {
         const fixture = MockRender(BattlePageComponent);
         const instance = fixture.point.componentInstance;
+        const opponentDetails = { ...mockOpponentDetails, name: 'Tested' };
 
         instance.battlefieldState$ = of({
           ...nonEmptyBattlefield,
@@ -120,6 +137,55 @@ describe(BattlePageComponent.name, () => {
         expect(opponentNameEl).toBeDefined();
       });
 
+      it('should get decorated when is a winner', async () => {
+        const fixture = MockRender(BattlePageComponent);
+        const instance = fixture.point.componentInstance;
+        const opponentDetails = { ...mockOpponentDetails, name: 'Tested' };
+
+        instance.battlefieldState$ = of({
+          ...nonEmptyBattlefield,
+          [testCase.storeKey]: opponentDetails,
+          outcome: BattleOutcome.WINNER_FOUND,
+          winner: opponentDetails,
+        });
+
+        fixture.detectChanges();
+
+        const opponentDetailsEl = (
+          await screen.findAllByTestId('opponent-details')
+        )[testCase.idx];
+
+        const winnerBadge = getByTestId(opponentDetailsEl, 'winner-badge');
+        expect(winnerBadge).toBeDefined();
+      });
+
+      it('should NOT get decorated when is not a winner', async () => {
+        const fixture = MockRender(BattlePageComponent);
+        const instance = fixture.point.componentInstance;
+        const opponentDetails = { ...mockOpponentDetails, name: 'Tested' };
+
+        instance.battlefieldState$ = of({
+          ...nonEmptyBattlefield,
+          [testCase.storeKey]: opponentDetails,
+          outcome: BattleOutcome.WINNER_FOUND,
+          winner: mockOpponentDetails,
+        });
+
+        fixture.detectChanges();
+
+        const opponentDetailsEl = (
+          await screen.findAllByTestId('opponent-details')
+        )[testCase.idx];
+
+        const winnerBadges = await queryAllByTestId(
+          opponentDetailsEl,
+          'winner-badge',
+        );
+        expect(winnerBadges.length).toEqual(0);
+      });
+
+      /* reusable detail test */
+
       const hasText = (text: string[]) => (accessibleName: string) =>
         text.every((text) => accessibleName.includes(text));
 
@@ -134,7 +200,7 @@ describe(BattlePageComponent.name, () => {
 
           instance.battlefieldState$ = of({
             ...nonEmptyBattlefield,
-            [testCase.storeKey]: opponentDetails,
+            [testCase.storeKey]: mockOpponentDetails,
           });
 
           fixture.detectChanges();
@@ -149,17 +215,31 @@ describe(BattlePageComponent.name, () => {
           expect(opponentNameEl).toBeDefined();
         });
 
-      shouldShowDetail('birth year', 'Birth year', opponentDetails.birth_year);
+      /* detail tests */
 
-      shouldShowDetail('eye color', 'Eye color', opponentDetails.eye_color);
+      shouldShowDetail(
+        'birth year',
+        'Birth year',
+        mockOpponentDetails.birth_year,
+      );
 
-      shouldShowDetail('hair color', 'Hair color', opponentDetails.hair_color);
+      shouldShowDetail('eye color', 'Eye color', mockOpponentDetails.eye_color);
 
-      shouldShowDetail('height', 'Height', opponentDetails.height);
+      shouldShowDetail(
+        'hair color',
+        'Hair color',
+        mockOpponentDetails.hair_color,
+      );
 
-      shouldShowDetail('mass', 'Mass', opponentDetails.mass);
+      shouldShowDetail('height', 'Height', mockOpponentDetails.height);
 
-      shouldShowDetail('skin color', 'Skin color', opponentDetails.skin_color);
+      shouldShowDetail('mass', 'Mass', mockOpponentDetails.mass);
+
+      shouldShowDetail(
+        'skin color',
+        'Skin color',
+        mockOpponentDetails.skin_color,
+      );
     }),
   );
 });
