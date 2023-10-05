@@ -3,31 +3,12 @@ import { PeopleBattleService } from './people-battle.service';
 import { AppComponent } from '@/app.component';
 import { of } from 'rxjs';
 import { TestBed } from '@angular/core/testing';
-import { PersonDetails } from '../models/person-details.model';
 import { BattleOutcome } from '../types/battle-status.enum';
 import { ResourcesService } from './resources.service';
-
-const heavierOpponent = {
-  birth_year: '19 BBY',
-  eye_color: 'Blue',
-  gender: 'Male',
-  hair_color: 'Blond',
-  height: '172',
-  mass: '77',
-  name: 'Luke Skywalker',
-  skin_color: 'Fair',
-} satisfies PersonDetails;
-
-const lighterOpponent = {
-  birth_year: '21 BBY',
-  eye_color: 'Blue',
-  gender: 'Male',
-  hair_color: 'Blond',
-  height: '152',
-  mass: '50',
-  name: 'Luke Skywalker Light',
-  skin_color: 'Fair',
-} satisfies PersonDetails;
+import {
+  heavierOpponent,
+  lighterOpponent,
+} from '../mocks/person-details.mocks';
 
 const mockOpponentDetailsResponse = {
   height: '170',

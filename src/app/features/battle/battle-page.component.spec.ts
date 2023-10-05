@@ -13,6 +13,9 @@ import { StarshipBattleService } from './services/starship-battle.service';
 import { PersonOpponentCardComponent } from './components/person-opponent-card/person-opponent-card.component';
 import { StarshipOpponentCardComponent } from './components/starship-opponent-card/starship-opponent-card.component';
 import { StarshipDetails } from './models/starship-details.model';
+import { heavierOpponent, lighterOpponent } from './mocks/person-details.mocks';
+import { EMPTY, of } from 'rxjs';
+import { ResourceType } from './types/resource-type.enum';
 
 describe(BattlePageComponent.name, () => {
   MockInstance.scope();
@@ -48,6 +51,53 @@ describe(BattlePageComponent.name, () => {
       const initBattleSpy = spyOn(tested.point.componentInstance, 'initBattle');
 
       ngMocks.click(['data-testid', 'button-start-battle']);
+
+      expect(initBattleSpy).toHaveBeenCalled();
+    });
+  });
+
+  describe('initBattle()', () => {
+    it('should call PeopleBattleService.initBattle() when people are selected', () => {
+      const initBattleSpy = jasmine.createSpy().and.returnValue(EMPTY);
+      MockInstance(PeopleBattleService, 'initBattle', initBattleSpy);
+
+      const fixture = MockRender(BattlePageComponent);
+      const instance = fixture.point.componentInstance;
+
+      instance.resourceType = ResourceType.PEOPLE;
+
+      instance.initBattle();
+
+      expect(initBattleSpy).toHaveBeenCalled();
+    });
+
+    it('should increment score of the winning side', () => {
+      const mockBattle = {
+        opponents: [heavierOpponent, lighterOpponent],
+        outcome: BattleOutcome.WINNER_FOUND,
+        winner: heavierOpponent,
+      } satisfies Battle;
+
+      MockInstance(PeopleBattleService, 'initBattle', () => of(mockBattle));
+
+      const fixture = MockRender(BattlePageComponent);
+      const instance = fixture.point.componentInstance;
+
+      instance.resourceType = ResourceType.PEOPLE;
+      instance.initBattle();
+
+      expect(instance.score[0]).toEqual(1);
+      expect(instance.score[1]).toEqual(0);
+    });
+
+    it('should call StarshipBattleService.initBattle() when starships are selected', () => {
+      const initBattleSpy = jasmine.createSpy().and.returnValue(EMPTY);
+      MockInstance(StarshipBattleService, 'initBattle', initBattleSpy);
+
+      const tested = MockRender(BattlePageComponent);
+      tested.point.componentInstance.resourceType = ResourceType.STARSHIPS;
+
+      tested.point.componentInstance.initBattle();
 
       expect(initBattleSpy).toHaveBeenCalled();
     });
