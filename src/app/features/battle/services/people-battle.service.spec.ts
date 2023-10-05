@@ -1,6 +1,5 @@
 import { MockBuilder, MockInstance } from 'ng-mocks';
 import { PeopleBattleService } from './people-battle.service';
-import { StarWarsApiService } from '@/api/start-wars-api/star-wars-api.service';
 import { AppComponent } from '@/app.component';
 import { of } from 'rxjs';
 import { TestBed } from '@angular/core/testing';

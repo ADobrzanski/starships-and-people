@@ -1,14 +1,11 @@
 <div class="scoreboard">
-  <span
-    class="score score__first-player"
-    [attr.data-testid]="'score-first-player'"
-  >
+  <span class="score score__first-player" data-testid="score-first-player">
     {{ score[0] }}
   </span>
 
   <div class="battle-controls">
     <div class="battle-controls__select">
-      <mat-form-field subscriptSizing="dynamic">
+      <mat-form-field subscriptSizing="dynamic" data-testid="resource-select">
         <mat-label>Who's fighting?</mat-label>
         <mat-select [(ngModel)]="resourceType">
           <mat-option [value]="ResourceType.PEOPLE">People</mat-option>
@@ -40,7 +37,7 @@
       class="card"
       [opponent]="opponent"
       [isWinner]="opponent === battle.winner"
-      data-testid="'opponent-details'"
+      data-testid="opponent-details"
     />
     <app-starship-opponent-card
       *ngIf="isStarshipDetails(opponent)"
