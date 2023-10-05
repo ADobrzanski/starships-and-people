@@ -6,8 +6,8 @@ import { TestBed } from '@angular/core/testing';
 import { BattleOutcome } from '../types/battle-status.enum';
 import { ResourcesService } from './resources.service';
 import {
-  heavierOpponent,
-  lighterOpponent,
+  mockPersonDetailsHeavier,
+  mockPersonDetailsLighter,
 } from '../mocks/person-details.mocks';
 
 const mockOpponentDetailsResponse = {
@@ -85,7 +85,7 @@ describe(PeopleBattleService.name, () => {
 
       const service = TestBed.inject(PeopleBattleService);
 
-      const expectedWinner = heavierOpponent;
+      const expectedWinner = mockPersonDetailsHeavier;
 
       spyOn(service, 'decideOutcome').and.returnValue({
         outcome: BattleOutcome.WINNER_FOUND,
@@ -102,20 +102,23 @@ describe(PeopleBattleService.name, () => {
     it('should return WINNER_FOUND outcome and declare heavier opponent winner', () => {
       const service = TestBed.inject(PeopleBattleService);
 
-      expect(service.decideOutcome([heavierOpponent, lighterOpponent])).toEqual(
-        {
-          outcome: BattleOutcome.WINNER_FOUND,
-          winner: heavierOpponent,
-        },
-      );
+      expect(
+        service.decideOutcome([
+          mockPersonDetailsHeavier,
+          mockPersonDetailsLighter,
+        ]),
+      ).toEqual({
+        outcome: BattleOutcome.WINNER_FOUND,
+        winner: mockPersonDetailsHeavier,
+      });
     });
 
     it('should return UNDECIDABLE outcome and no winner when one of the opponents weight is unknown', () => {
       const service = TestBed.inject(PeopleBattleService);
 
       const result = service.decideOutcome([
-        { ...heavierOpponent, mass: 'unknown' },
-        lighterOpponent,
+        { ...mockPersonDetailsHeavier, mass: 'unknown' },
+        mockPersonDetailsLighter,
       ]);
 
       expect(result).toEqual({ outcome: BattleOutcome.UNDECIDABLE });
@@ -124,9 +127,12 @@ describe(PeopleBattleService.name, () => {
     it('should have DRAW outcome when both opponents weight the same', () => {
       const service = TestBed.inject(PeopleBattleService);
 
-      expect(service.decideOutcome([lighterOpponent, lighterOpponent])).toEqual(
-        { outcome: BattleOutcome.DRAW },
-      );
+      expect(
+        service.decideOutcome([
+          mockPersonDetailsLighter,
+          mockPersonDetailsLighter,
+        ]),
+      ).toEqual({ outcome: BattleOutcome.DRAW });
     });
   });
 });

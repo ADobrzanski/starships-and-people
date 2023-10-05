@@ -2,7 +2,7 @@ import { screen } from '@testing-library/dom';
 import { PersonOpponentCardComponent } from './person-opponent-card.component';
 import { MockBuilder, MockRender } from 'ng-mocks';
 import { MatCardModule } from '@angular/material/card';
-import { PersonDetails } from '../../models/person-details.model';
+import { mockPersonDetailsLighter } from '../../mocks/person-details.mocks';
 
 describe('PersonOpponentCardComponent', () => {
   beforeEach(() =>
@@ -14,32 +14,7 @@ describe('PersonOpponentCardComponent', () => {
     expect(fixture.point.componentInstance).toBeTruthy();
   });
 
-  const mockPersonDetails = {
-    birth_year: '19 BBY',
-    eye_color: 'Blue',
-    gender: 'Male',
-    hair_color: 'Blond',
-    height: '172',
-    mass: '77',
-    name: 'Luke Skywalker',
-    skin_color: 'Fair',
-  } satisfies PersonDetails;
-
-  // const mockStarshipDetails = {
-  //   model: 'T-65 X-wing',
-  //   starship_class: 'Starfighter',
-  //   manufacturer: 'Incom Corporation',
-  //   cost_in_credits: '149999',
-  //   length: '12.5',
-  //   crew: '1',
-  //   passengers: '0',
-  //   max_atmosphering_speed: '1050',
-  //   hyperdrive_rating: '1.0',
-  //   MGLT: '100',
-  //   cargo_capacity: '110',
-  //   consumables: '1 week',
-  //   name: 'X-wing',
-  // } satisfies StarshipDetails;
+  const mockPersonDetails = mockPersonDetailsLighter;
 
   it('should show opponent`s name', () => {
     MockRender(PersonOpponentCardComponent, {

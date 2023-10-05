@@ -2,7 +2,7 @@ import { screen } from '@testing-library/dom';
 import { MockBuilder, MockRender } from 'ng-mocks';
 import { MatCardModule } from '@angular/material/card';
 import { StarshipOpponentCardComponent } from './starship-opponent-card.component';
-import { StarshipDetails } from '../../models/starship-details.model';
+import { mockStarshipDetailsBigCrew } from '../../mocks/starship-details.mocks';
 
 describe(StarshipOpponentCardComponent.name, () => {
   beforeEach(() =>
@@ -14,21 +14,7 @@ describe(StarshipOpponentCardComponent.name, () => {
     expect(fixture.point.componentInstance).toBeTruthy();
   });
 
-  const mockStarshipDetails = {
-    model: 'T-65 X-wing',
-    starship_class: 'Starfighter',
-    manufacturer: 'Incom Corporation',
-    cost_in_credits: '149999',
-    length: '12.5',
-    crew: '1',
-    passengers: '0',
-    max_atmosphering_speed: '1050',
-    hyperdrive_rating: '1.0',
-    MGLT: '100',
-    cargo_capacity: '110',
-    consumables: '1 week',
-    name: 'X-wing',
-  } satisfies StarshipDetails;
+  const mockStarshipDetails = mockStarshipDetailsBigCrew;
 
   it('should show opponent`s name', () => {
     MockRender(StarshipOpponentCardComponent, {

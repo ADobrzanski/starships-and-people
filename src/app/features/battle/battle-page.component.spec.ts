@@ -2,7 +2,6 @@ import { MockBuilder, MockInstance, MockRender, ngMocks } from 'ng-mocks';
 
 import { BattlePageComponent } from './battle-page.component';
 import { PeopleBattleService } from './services/people-battle.service';
-import { PersonDetails } from './models/person-details.model';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -12,10 +11,16 @@ import { Battle } from './models/battle.model';
 import { StarshipBattleService } from './services/starship-battle.service';
 import { PersonOpponentCardComponent } from './components/person-opponent-card/person-opponent-card.component';
 import { StarshipOpponentCardComponent } from './components/starship-opponent-card/starship-opponent-card.component';
-import { StarshipDetails } from './models/starship-details.model';
-import { heavierOpponent, lighterOpponent } from './mocks/person-details.mocks';
+import {
+  mockPersonDetailsHeavier,
+  mockPersonDetailsLighter,
+} from './mocks/person-details.mocks';
 import { EMPTY, of } from 'rxjs';
 import { ResourceType } from './types/resource-type.enum';
+import {
+  mockStarshipDetailsBigCrew,
+  mockStarshipDetailsSmallCrew,
+} from './mocks/starship-details.mocks';
 
 describe(BattlePageComponent.name, () => {
   MockInstance.scope();
@@ -73,9 +78,9 @@ describe(BattlePageComponent.name, () => {
 
     it('should increment score of the winning side', () => {
       const mockBattle = {
-        opponents: [heavierOpponent, lighterOpponent],
+        opponents: [mockPersonDetailsHeavier, mockPersonDetailsLighter],
         outcome: BattleOutcome.WINNER_FOUND,
-        winner: heavierOpponent,
+        winner: mockPersonDetailsHeavier,
       } satisfies Battle;
 
       MockInstance(PeopleBattleService, 'initBattle', () => of(mockBattle));
@@ -103,60 +108,6 @@ describe(BattlePageComponent.name, () => {
     });
   });
 
-  const mockPersonDetails = {
-    birth_year: '19 BBY',
-    eye_color: 'Blue',
-    gender: 'Male',
-    hair_color: 'Blond',
-    height: '172',
-    mass: '77',
-    name: 'Luke Skywalker',
-    skin_color: 'Fair',
-  } satisfies PersonDetails;
-
-  const mockPersonDetails2 = {
-    birth_year: '10 BBY',
-    eye_color: 'Brown',
-    gender: 'Male',
-    hair_color: 'Brown',
-    height: '178',
-    mass: '82',
-    name: 'Obi-Wan Kenobi',
-    skin_color: 'Fair',
-  } satisfies PersonDetails;
-
-  const mockStarshipDetails = {
-    model: 'T-65 X-wing',
-    starship_class: 'Starfighter',
-    manufacturer: 'Incom Corporation',
-    cost_in_credits: '149999',
-    length: '12.5',
-    crew: '1',
-    passengers: '0',
-    max_atmosphering_speed: '1050',
-    hyperdrive_rating: '1.0',
-    MGLT: '100',
-    cargo_capacity: '110',
-    consumables: '1 week',
-    name: 'X-wing',
-  } satisfies StarshipDetails;
-
-  const mockStarshipDetails2 = {
-    model: 'Executor-class star dreadnought',
-    starship_class: 'Star dreadnought',
-    manufacturer: 'Kuat Drive Yards, Fondor Shipyards',
-    cost_in_credits: '1143350000',
-    length: '19000',
-    crew: '279,144',
-    passengers: '38000',
-    max_atmosphering_speed: 'n/a',
-    hyperdrive_rating: '2.0',
-    MGLT: '40',
-    cargo_capacity: '250000000',
-    consumables: '6 years',
-    name: 'Executor',
-  } satisfies StarshipDetails;
-
   describe('opponents', () => {
     it('should NOT get rendered when there are NO opponents on the battlefield', async () => {
       const fixture = MockRender(BattlePageComponent);
@@ -181,7 +132,7 @@ describe(BattlePageComponent.name, () => {
       const instance = fixture.point.componentInstance;
 
       const battle = {
-        opponents: [mockPersonDetails, mockPersonDetails2],
+        opponents: [mockPersonDetailsLighter, mockPersonDetailsHeavier],
         outcome: BattleOutcome.DRAW,
       } satisfies Battle;
 
@@ -204,7 +155,7 @@ describe(BattlePageComponent.name, () => {
       const instance = fixture.point.componentInstance;
 
       const battle = {
-        opponents: [mockStarshipDetails, mockStarshipDetails2],
+        opponents: [mockStarshipDetailsSmallCrew, mockStarshipDetailsBigCrew],
         outcome: BattleOutcome.DRAW,
       } satisfies Battle;
 
@@ -227,9 +178,9 @@ describe(BattlePageComponent.name, () => {
       const instance = fixture.point.componentInstance;
 
       const battle = {
-        opponents: [mockPersonDetails, mockPersonDetails2],
+        opponents: [mockPersonDetailsLighter, mockPersonDetailsHeavier],
         outcome: BattleOutcome.WINNER_FOUND,
-        winner: mockPersonDetails2,
+        winner: mockPersonDetailsHeavier,
       } satisfies Battle;
 
       instance.battle = battle;
@@ -246,7 +197,7 @@ describe(BattlePageComponent.name, () => {
       const instance = fixture.point.componentInstance;
 
       const battle = {
-        opponents: [mockPersonDetails, mockPersonDetails2],
+        opponents: [mockPersonDetailsLighter, mockPersonDetailsHeavier],
         outcome: BattleOutcome.DRAW,
       } satisfies Battle;
 
