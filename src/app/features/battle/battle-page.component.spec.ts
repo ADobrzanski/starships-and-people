@@ -15,6 +15,7 @@ import {
   queryAllByTestId,
 } from '@testing-library/dom';
 import { BattleOutcome } from './types/battle-status.enum';
+import { Battle } from './models/battle.model';
 
 describe(BattlePageComponent.name, () => {
   MockInstance.scope();
@@ -28,18 +29,11 @@ describe(BattlePageComponent.name, () => {
   );
 
   beforeEach(() =>
-    MockInstance(
-      BattleService,
-      'battle',
+    MockInstance(BattleService, 'initBattle', () =>
       of({
-        firstOpponent: undefined,
-        secondOpponent: undefined,
-        score: {
-          firstPlayer: 0,
-          secondPlayer: 0,
-        },
+        opponents: [{}, {}],
         outcome: BattleOutcome.UNDECIDABLE,
-      }),
+      } satisfies Battle),
     ),
   );
 
@@ -69,8 +63,8 @@ describe(BattlePageComponent.name, () => {
   });
 
   const opponentsTestCases = [
-    { name: 'first opponent', idx: 0, storeKey: 'firstOpponent' },
-    { name: 'second opponent', idx: 1, storeKey: 'secondOpponent' },
+    { name: 'first opponent', idx: 0 },
+    { name: 'second opponent', idx: 1 },
   ];
 
   opponentsTestCases.forEach((testCase) =>
@@ -88,31 +82,21 @@ describe(BattlePageComponent.name, () => {
         skin_color: 'Fair',
       } satisfies PersonDetails;
 
-      const emptyBattlefield = {
-        firstOpponent: undefined,
-        secondOpponent: undefined,
-        outcome: BattleOutcome.UNDECIDABLE,
-        score: { firstPlayer: 0, secondPlayer: 0 },
-      } as const;
-
-      const nonEmptyBattlefield = {
-        firstOpponent: mockOpponentDetails,
-        secondOpponent: mockOpponentDetails,
-        outcome: BattleOutcome.DRAW,
-        score: { firstPlayer: 0, secondPlayer: 0 },
-      } as const;
-
       /* tests */
 
       it('should get rendered when there are opponents on the battlefield', () => {
         const fixture = MockRender(BattlePageComponent);
         const instance = fixture.point.componentInstance;
-        const opponentDetails = { ...mockOpponentDetails, name: 'Tested' };
 
-        instance.battlefieldState$ = of({
-          ...nonEmptyBattlefield,
-          [testCase.storeKey]: opponentDetails,
-        });
+        const battle = {
+          opponents: [mockOpponentDetails, mockOpponentDetails],
+          outcome: BattleOutcome.DRAW,
+        } satisfies Battle;
+
+        battle.opponents[testCase.idx] = mockOpponentDetails;
+
+        instance.battle = battle;
+
         fixture.detectChanges();
 
         expect(
@@ -124,7 +108,13 @@ describe(BattlePageComponent.name, () => {
         const fixture = MockRender(BattlePageComponent);
         const instance = fixture.point.componentInstance;
 
-        instance.battlefieldState$ = of(emptyBattlefield);
+        const battle = {
+          opponents: undefined,
+          outcome: BattleOutcome.DRAW,
+        } satisfies Battle;
+
+        instance.battle = battle;
+
         fixture.detectChanges();
 
         const opponentDetailsElList =
@@ -135,12 +125,17 @@ describe(BattlePageComponent.name, () => {
       it('should show opponent`s name', async () => {
         const fixture = MockRender(BattlePageComponent);
         const instance = fixture.point.componentInstance;
+
         const opponentDetails = { ...mockOpponentDetails, name: 'Tested' };
 
-        instance.battlefieldState$ = of({
-          ...nonEmptyBattlefield,
-          [testCase.storeKey]: opponentDetails,
-        });
+        const battle = {
+          opponents: [mockOpponentDetails, mockOpponentDetails],
+          outcome: BattleOutcome.DRAW,
+        } satisfies Battle;
+
+        battle.opponents[testCase.idx] = opponentDetails;
+
+        instance.battle = battle;
 
         fixture.detectChanges();
 
@@ -158,14 +153,18 @@ describe(BattlePageComponent.name, () => {
       it('should get decorated when is a winner', async () => {
         const fixture = MockRender(BattlePageComponent);
         const instance = fixture.point.componentInstance;
+
         const opponentDetails = { ...mockOpponentDetails, name: 'Tested' };
 
-        instance.battlefieldState$ = of({
-          ...nonEmptyBattlefield,
-          [testCase.storeKey]: opponentDetails,
+        const battle = {
+          opponents: [mockOpponentDetails, mockOpponentDetails],
           outcome: BattleOutcome.WINNER_FOUND,
           winner: opponentDetails,
-        });
+        } satisfies Battle;
+
+        battle.opponents[testCase.idx] = opponentDetails;
+
+        instance.battle = battle;
 
         fixture.detectChanges();
 
@@ -180,14 +179,18 @@ describe(BattlePageComponent.name, () => {
       it('should NOT get decorated when is not a winner', async () => {
         const fixture = MockRender(BattlePageComponent);
         const instance = fixture.point.componentInstance;
+
         const opponentDetails = { ...mockOpponentDetails, name: 'Tested' };
 
-        instance.battlefieldState$ = of({
-          ...nonEmptyBattlefield,
-          [testCase.storeKey]: opponentDetails,
+        const battle = {
+          opponents: [mockOpponentDetails, mockOpponentDetails],
           outcome: BattleOutcome.WINNER_FOUND,
           winner: mockOpponentDetails,
-        });
+        } satisfies Battle;
+
+        battle.opponents[testCase.idx] = opponentDetails;
+
+        instance.battle = battle;
 
         fixture.detectChanges();
 
@@ -216,10 +219,12 @@ describe(BattlePageComponent.name, () => {
           const fixture = MockRender(BattlePageComponent);
           const instance = fixture.point.componentInstance;
 
-          instance.battlefieldState$ = of({
-            ...nonEmptyBattlefield,
-            [testCase.storeKey]: mockOpponentDetails,
-          });
+          const battle = {
+            opponents: [mockOpponentDetails, mockOpponentDetails],
+            outcome: BattleOutcome.DRAW,
+          } satisfies Battle;
+
+          instance.battle = battle;
 
           fixture.detectChanges();
 
@@ -266,42 +271,28 @@ describe(BattlePageComponent.name, () => {
       const fixture = MockRender(BattlePageComponent);
       const instance = fixture.point.componentInstance;
 
-      const score = { firstPlayer: 5, secondPlayer: 12 };
+      const testedScore = 12;
 
-      instance.battlefieldState$ = of({
-        firstOpponent: undefined,
-        secondOpponent: undefined,
-        outcome: BattleOutcome.UNDECIDABLE,
-        score,
-      });
+      instance.score = [testedScore, 0];
 
       fixture.detectChanges();
 
       const firstPlayerScoreEl = screen.getByTestId('score-first-player');
-      expect(firstPlayerScoreEl.textContent).toContain(
-        score.firstPlayer.toString(),
-      );
+      expect(firstPlayerScoreEl.textContent).toContain(testedScore.toString());
     });
 
     it('should present second player`s score', () => {
       const fixture = MockRender(BattlePageComponent);
       const instance = fixture.point.componentInstance;
 
-      const score = { firstPlayer: 5, secondPlayer: 12 };
+      const testedScore = 4;
 
-      instance.battlefieldState$ = of({
-        firstOpponent: undefined,
-        secondOpponent: undefined,
-        outcome: BattleOutcome.UNDECIDABLE,
-        score,
-      });
+      instance.score = [0, testedScore];
 
       fixture.detectChanges();
 
       const secondPlayerScoreEl = screen.getByTestId('score-second-player');
-      expect(secondPlayerScoreEl.textContent).toContain(
-        score.secondPlayer.toString(),
-      );
+      expect(secondPlayerScoreEl.textContent).toContain(testedScore.toString());
     });
   });
 });

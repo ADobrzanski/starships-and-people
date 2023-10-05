@@ -1,46 +1,46 @@
 <ng-container *ngIf="battlefieldState$ | async as battlefieldState">
-  <div class="scoreboard">
-    <span class="score score__first-player" data-testid="score-first-player">
-      {{ battlefieldState.score.firstPlayer }}
-    </span>
-    <button
-      mat-raised-button
-      color="accent"
-      [attr.data-testid]="'button-start-battle'"
-      (click)="initBattle()"
-    >
-      Battle!
-    </button>
-    <span class="score score__second-player" data-testid="score-second-player">
-      {{ battlefieldState.score.secondPlayer }}
-    </span>
-  </div>
+<div class="scoreboard">
+  <span class="score score__first-player" data-testid="score-first-player">
+    {{ score[0] }}
+  </span>
+  <button
+    mat-raised-button
+    color="accent"
+    [attr.data-testid]="'button-start-battle'"
+    (click)="initBattle()"
+  >
+    Battle!
+  </button>
+  <span class="score score__second-player" data-testid="score-second-player">
+    {{ score[1] }}
+  </span>
+</div>
 
-  <main class="card-container">
-    <ng-container *ngIf="battlefieldState.firstOpponent as opponent">
-      <ng-container
-        *ngTemplateOutlet="
-          opponentDetails;
-          context: {
-            $implicit: opponent,
-            isWinner: opponent === battlefieldState.winner
-          }
-        "
-      ></ng-container>
-    </ng-container>
+<main class="card-container">
+  <ng-container *ngIf="battle.opponents?.[0] as opponent">
+    <ng-container
+      *ngTemplateOutlet="
+        opponentDetails;
+        context: {
+          $implicit: opponent,
+          isWinner: opponent === battle.winner
+        }
+      "
+    ></ng-container>
+  </ng-container>
 
-    <ng-container *ngIf="battlefieldState.secondOpponent as opponent">
-      <ng-container
-        *ngTemplateOutlet="
-          opponentDetails;
-          context: {
-            $implicit: opponent,
-            isWinner: opponent === battlefieldState.winner
-          }
-        "
-      ></ng-container>
-    </ng-container>
-  </main>
+  <ng-container *ngIf="battle.opponents?.[1] as opponent">
+    <ng-container
+      *ngTemplateOutlet="
+        opponentDetails;
+        context: {
+          $implicit: opponent,
+          isWinner: opponent === battle.winner
+        }
+      "
+    ></ng-container>
+  </ng-container>
+</main>
 </ng-container>
 
 <ng-template #opponentDetails let-opponent let-isWinner="isWinner">
