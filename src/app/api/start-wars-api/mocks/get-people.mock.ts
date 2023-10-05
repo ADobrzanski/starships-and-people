@@ -1,9 +1,9 @@
 import { UnwrapObservable } from '@/types/unwrap-observable.type';
 import { of } from 'rxjs';
-import { StartWarsApiService } from '../star-wars-api.service';
+import { StarWarsApiService } from '../star-wars-api.service';
 
 type GetPeopleResponse = UnwrapObservable<
-  ReturnType<StartWarsApiService['getPeople']>
+  ReturnType<StarWarsApiService['getPeople']>
 >;
 
 export const createGetPeopleResponseEntry = (uid: string) =>
@@ -14,12 +14,12 @@ export const createGetPeopleResponseEntry = (uid: string) =>
   }) satisfies GetPeopleResponse['results'][number];
 
 /**
- *  Creates a mock of the StartWarsApiService.getPeople() method. Handles basic pagination.
+ *  Creates a mock of the StarWarsApiService.getPeople() method. Handles basic pagination.
  *  @param records - The records from which pages will be created.
- *  @returns A mock of the StartWarsApiService.getPeople() method.
+ *  @returns A mock of the StarWarsApiService.getPeople() method.
  */
 export const createGetPeopleResponse =
-  (records: GetPeopleResponse['results']): StartWarsApiService['getPeople'] =>
+  (records: GetPeopleResponse['results']): StarWarsApiService['getPeople'] =>
   (options) => {
     options ??= { page: 1, pageSize: 10 };
     const totalPages = Math.ceil(records.length / options.pageSize);

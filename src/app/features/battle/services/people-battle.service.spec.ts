@@ -1,6 +1,6 @@
 import { MockBuilder, MockInstance } from 'ng-mocks';
-import { BattleService } from './battle.service';
-import { StartWarsApiService } from '@/api/start-wars-api/star-wars-api.service';
+import { PeopleBattleService } from './people-battle.service';
+import { StarWarsApiService } from '@/api/start-wars-api/star-wars-api.service';
 import { AppComponent } from '@/app.component';
 import { of } from 'rxjs';
 import { TestBed } from '@angular/core/testing';
@@ -45,15 +45,15 @@ const mockOpponentDetailsResponse = {
   url: 'http://swapi.dev/api/people/1/',
 };
 
-describe(BattleService.name, () => {
+describe(PeopleBattleService.name, () => {
   beforeEach(() =>
-    MockBuilder(BattleService, AppComponent).mock(StartWarsApiService, {
-      getPeople: () => of(),
+    MockBuilder(PeopleBattleService, AppComponent).mock(ResourcesService, {
+      getRandomPersonDetails: () => of(),
     }),
   );
 
   it('should instantiate', () => {
-    const service = TestBed.inject(BattleService);
+    const service = TestBed.inject(PeopleBattleService);
     expect(service).toBeDefined();
   });
 
@@ -69,7 +69,7 @@ describe(BattleService.name, () => {
         getRandomPersonDetailsSpy,
       );
 
-      const service = TestBed.inject(BattleService);
+      const service = TestBed.inject(PeopleBattleService);
 
       service.initBattle().subscribe((battle) => {
         expect(getRandomPersonDetailsSpy).toHaveBeenCalledTimes(2);
@@ -85,7 +85,7 @@ describe(BattleService.name, () => {
         of(mockOpponentDetailsResponse),
       );
 
-      const service = TestBed.inject(BattleService);
+      const service = TestBed.inject(PeopleBattleService);
 
       const expectedOutcome = BattleOutcome.UNDECIDABLE;
 
@@ -103,7 +103,7 @@ describe(BattleService.name, () => {
         of(mockOpponentDetailsResponse),
       );
 
-      const service = TestBed.inject(BattleService);
+      const service = TestBed.inject(PeopleBattleService);
 
       const expectedWinner = heavierOpponent;
 
@@ -120,7 +120,7 @@ describe(BattleService.name, () => {
 
   describe('decideOutcome()', () => {
     it('should return WINNER_FOUND outcome and declare heavier opponent winner', () => {
-      const service = TestBed.inject(BattleService);
+      const service = TestBed.inject(PeopleBattleService);
 
       expect(service.decideOutcome([heavierOpponent, lighterOpponent])).toEqual(
         {
@@ -131,7 +131,7 @@ describe(BattleService.name, () => {
     });
 
     it('should return UNDECIDABLE outcome and no winner when one of the opponents weight is unknown', () => {
-      const service = TestBed.inject(BattleService);
+      const service = TestBed.inject(PeopleBattleService);
 
       const result = service.decideOutcome([
         { ...heavierOpponent, mass: 'unknown' },
@@ -142,7 +142,7 @@ describe(BattleService.name, () => {
     });
 
     it('should have DRAW outcome when both opponents weight the same', () => {
-      const service = TestBed.inject(BattleService);
+      const service = TestBed.inject(PeopleBattleService);
 
       expect(service.decideOutcome([lighterOpponent, lighterOpponent])).toEqual(
         { outcome: BattleOutcome.DRAW },

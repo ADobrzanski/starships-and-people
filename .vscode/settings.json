@@ -1,5 +1,14 @@
 {
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnSave": true,
-  "cSpell.words": ["homeworld", "Skywalker"]
+  "cSpell.words": [
+    "atmosphering",
+    "homeworld",
+    "hyperdrive",
+    "Kenobi",
+    "mglt",
+    "Skywalker",
+    "Starships",
+    "testid"
+  ]
 }

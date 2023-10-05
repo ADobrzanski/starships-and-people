@@ -1,0 +1,63 @@
+<mat-card class="card" [appearance]="'outlined'">
+  <mat-card-header>
+    <mat-card-title>
+      <span *ngIf="isWinner" [attr.data-testid]="'winner-badge'">🥇</span>
+      {{ opponent?.name }}
+    </mat-card-title>
+    <mat-card-subtitle>Starship</mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content>
+    <table class="details-table">
+      <tbody>
+        <tr>
+          <th scope="row">Model</th>
+          <td>{{ opponent?.model }}</td>
+        </tr>
+        <tr>
+          <th scope="row">Class</th>
+          <td>{{ opponent?.starship_class }}</td>
+        </tr>
+        <tr>
+          <th scope="row">Manufacturer</th>
+          <td>{{ opponent?.manufacturer }}</td>
+        </tr>
+        <tr>
+          <th scope="row">Cost</th>
+          <td>{{ opponent?.cost_in_credits }}</td>
+        </tr>
+        <tr>
+          <th scope="row">Length</th>
+          <td>{{ opponent?.length }}</td>
+        </tr>
+        <tr>
+          <th scope="row">Crew</th>
+          <td>{{ opponent?.crew }}</td>
+        </tr>
+        <tr>
+          <th scope="row">Passengers</th>
+          <td>{{ opponent?.passengers }}</td>
+        </tr>
+        <tr>
+          <th scope="row">Max atmosphering speed</th>
+          <td>{{ opponent?.max_atmosphering_speed }}</td>
+        </tr>
+        <tr>
+          <th scope="row">Hyperdrive rating</th>
+          <td>{{ opponent?.hyperdrive_rating }}</td>
+        </tr>
+        <tr>
+          <th scope="row">MGLT</th>
+          <td>{{ opponent?.MGLT }}</td>
+        </tr>
+        <tr>
+          <th scope="row">Cargo capacity</th>
+          <td>{{ opponent?.cargo_capacity }}</td>
+        </tr>
+        <tr>
+          <th scope="row">Consumables</th>
+          <td>{{ opponent?.consumables }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </mat-card-content>
+</mat-card>

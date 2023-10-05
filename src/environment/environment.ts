@@ -1,3 +1,3 @@
 export const environment = {
-  startWarsApiBaseUrl: 'https://swapi.tech/',
+  startWarsApiBaseUrl: 'https://swapi.tech/api',
 };

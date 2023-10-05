@@ -1,0 +1,43 @@
+<mat-card class="card" [appearance]="'outlined'">
+  <mat-card-header>
+    <mat-card-title>
+      <span *ngIf="isWinner" [attr.data-testid]="'winner-badge'">🥇</span>
+      {{ opponent?.name }}
+    </mat-card-title>
+    <mat-card-subtitle>Person</mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content>
+    <table class="details-table">
+      <tbody>
+        <tr>
+          <th scope="row">Birth year</th>
+          <td>{{ opponent?.birth_year }}</td>
+        </tr>
+        <tr>
+          <th scope="row">Eye color</th>
+          <td>{{ opponent?.eye_color }}</td>
+        </tr>
+        <tr>
+          <th scope="row">Gender</th>
+          <td>{{ opponent?.gender }}</td>
+        </tr>
+        <tr>
+          <th scope="row">Hair color</th>
+          <td>{{ opponent?.hair_color }}</td>
+        </tr>
+        <tr>
+          <th scope="row">Height</th>
+          <td>{{ opponent?.height }}</td>
+        </tr>
+        <tr>
+          <th scope="row">Mass</th>
+          <td>{{ opponent?.mass }}</td>
+        </tr>
+        <tr>
+          <th scope="row">Skin color</th>
+          <td>{{ opponent?.skin_color }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </mat-card-content>
+</mat-card>

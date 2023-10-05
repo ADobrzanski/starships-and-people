@@ -3,15 +3,15 @@ import {
   HttpTestingController,
 } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { StartWarsApiService } from './star-wars-api.service';
+import { StarWarsApiService } from './star-wars-api.service';
 import { StarWarsPeopleApi } from './models/star-wars-people-api.model';
 import { StarWarsPersonApi } from './models/star-wars-person-api.model';
 import { STAR_WARS_API_BASE_URL } from '@/core/tokens/star-wars-api-base-url.token';
 
-describe(StartWarsApiService.name, () => {
+describe(StarWarsApiService.name, () => {
   const baseApiUrl = 'http://testbaseapiurl.com';
 
-  let service: StartWarsApiService;
+  let service: StarWarsApiService;
   let httpTestingController: HttpTestingController;
 
   beforeEach(() => {
@@ -21,7 +21,7 @@ describe(StartWarsApiService.name, () => {
     });
 
     httpTestingController = TestBed.inject(HttpTestingController);
-    service = TestBed.inject(StartWarsApiService);
+    service = TestBed.inject(StarWarsApiService);
   });
 
   describe('getPeople', () => {

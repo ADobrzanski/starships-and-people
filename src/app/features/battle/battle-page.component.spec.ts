@@ -1,40 +1,31 @@
 import { MockBuilder, MockInstance, MockRender, ngMocks } from 'ng-mocks';
 
 import { BattlePageComponent } from './battle-page.component';
-import { BattleService } from './services/battle.service';
-import { of } from 'rxjs';
+import { PeopleBattleService } from './services/people-battle.service';
 import { PersonDetails } from './models/person-details.model';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import {
-  screen,
-  getByText,
-  getByRole,
-  getByTestId,
-  queryAllByTestId,
-} from '@testing-library/dom';
+import { screen } from '@testing-library/dom';
 import { BattleOutcome } from './types/battle-status.enum';
 import { Battle } from './models/battle.model';
+import { StarshipBattleService } from './services/starship-battle.service';
+import { PersonOpponentCardComponent } from './components/person-opponent-card/person-opponent-card.component';
+import { StarshipOpponentCardComponent } from './components/starship-opponent-card/starship-opponent-card.component';
+import { StarshipDetails } from './models/starship-details.model';
 
 describe(BattlePageComponent.name, () => {
   MockInstance.scope();
 
   beforeEach(() =>
     MockBuilder(BattlePageComponent)
-      .mock(BattleService, { export: true })
+      .mock(PeopleBattleService, { export: true })
+      .mock(StarshipBattleService, { export: true })
       .keep(MatCardModule)
       .keep(MatButtonModule)
-      .keep(MatIconModule),
-  );
-
-  beforeEach(() =>
-    MockInstance(BattleService, 'initBattle', () =>
-      of({
-        opponents: [{}, {}],
-        outcome: BattleOutcome.UNDECIDABLE,
-      } satisfies Battle),
-    ),
+      .keep(MatIconModule)
+      .keep(PersonOpponentCardComponent)
+      .keep(StarshipOpponentCardComponent),
   );
 
   it('should create', () => {
@@ -62,209 +53,162 @@ describe(BattlePageComponent.name, () => {
     });
   });
 
-  const opponentsTestCases = [
-    { name: 'first opponent', idx: 0 },
-    { name: 'second opponent', idx: 1 },
-  ];
+  const mockPersonDetails = {
+    birth_year: '19 BBY',
+    eye_color: 'Blue',
+    gender: 'Male',
+    hair_color: 'Blond',
+    height: '172',
+    mass: '77',
+    name: 'Luke Skywalker',
+    skin_color: 'Fair',
+  } satisfies PersonDetails;
 
-  opponentsTestCases.forEach((testCase) =>
-    describe(testCase.name, () => {
-      /* mock data */
+  const mockPersonDetails2 = {
+    birth_year: '10 BBY',
+    eye_color: 'Brown',
+    gender: 'Male',
+    hair_color: 'Brown',
+    height: '178',
+    mass: '82',
+    name: 'Obi-Wan Kenobi',
+    skin_color: 'Fair',
+  } satisfies PersonDetails;
 
-      const mockOpponentDetails = {
-        birth_year: '19 BBY',
-        eye_color: 'Blue',
-        gender: 'Male',
-        hair_color: 'Blond',
-        height: '172',
-        mass: '77',
-        name: 'Luke Skywalker',
-        skin_color: 'Fair',
-      } satisfies PersonDetails;
+  const mockStarshipDetails = {
+    model: 'T-65 X-wing',
+    starship_class: 'Starfighter',
+    manufacturer: 'Incom Corporation',
+    cost_in_credits: '149999',
+    length: '12.5',
+    crew: '1',
+    passengers: '0',
+    max_atmosphering_speed: '1050',
+    hyperdrive_rating: '1.0',
+    MGLT: '100',
+    cargo_capacity: '110',
+    consumables: '1 week',
+    name: 'X-wing',
+  } satisfies StarshipDetails;
 
-      /* tests */
+  const mockStarshipDetails2 = {
+    model: 'Executor-class star dreadnought',
+    starship_class: 'Star dreadnought',
+    manufacturer: 'Kuat Drive Yards, Fondor Shipyards',
+    cost_in_credits: '1143350000',
+    length: '19000',
+    crew: '279,144',
+    passengers: '38000',
+    max_atmosphering_speed: 'n/a',
+    hyperdrive_rating: '2.0',
+    MGLT: '40',
+    cargo_capacity: '250000000',
+    consumables: '6 years',
+    name: 'Executor',
+  } satisfies StarshipDetails;
 
-      it('should get rendered when there are opponents on the battlefield', () => {
-        const fixture = MockRender(BattlePageComponent);
-        const instance = fixture.point.componentInstance;
+  describe('opponents', () => {
+    it('should NOT get rendered when there are NO opponents on the battlefield', async () => {
+      const fixture = MockRender(BattlePageComponent);
+      const instance = fixture.point.componentInstance;
 
-        const battle = {
-          opponents: [mockOpponentDetails, mockOpponentDetails],
-          outcome: BattleOutcome.DRAW,
-        } satisfies Battle;
+      const battle = {
+        opponents: undefined,
+        outcome: BattleOutcome.DRAW,
+      } satisfies Battle;
 
-        battle.opponents[testCase.idx] = mockOpponentDetails;
+      instance.battle = battle;
 
-        instance.battle = battle;
+      instance.cdr.detectChanges();
 
-        fixture.detectChanges();
+      const opponentDetailsElList =
+        await screen.queryAllByTestId('opponent-details');
+      expect(opponentDetailsElList.length).toEqual(0);
+    });
 
-        expect(
-          ngMocks.findAll(['data-testid', 'opponent-details'])[testCase.idx],
-        ).toBeDefined();
-      });
+    it('should get rendered when there are opponents (people) on the battlefield', () => {
+      const fixture = MockRender(BattlePageComponent);
+      const instance = fixture.point.componentInstance;
 
-      it('should NOT get rendered when there are NO opponents on the battlefield', async () => {
-        const fixture = MockRender(BattlePageComponent);
-        const instance = fixture.point.componentInstance;
+      const battle = {
+        opponents: [mockPersonDetails, mockPersonDetails2],
+        outcome: BattleOutcome.DRAW,
+      } satisfies Battle;
 
-        const battle = {
-          opponents: undefined,
-          outcome: BattleOutcome.DRAW,
-        } satisfies Battle;
+      instance.battle = battle;
 
-        instance.battle = battle;
+      instance.cdr.detectChanges();
 
-        fixture.detectChanges();
-
-        const opponentDetailsElList =
-          await screen.queryAllByTestId('opponent-details');
-        expect(opponentDetailsElList.length).toEqual(0);
-      });
-
-      it('should show opponent`s name', async () => {
-        const fixture = MockRender(BattlePageComponent);
-        const instance = fixture.point.componentInstance;
-
-        const opponentDetails = { ...mockOpponentDetails, name: 'Tested' };
-
-        const battle = {
-          opponents: [mockOpponentDetails, mockOpponentDetails],
-          outcome: BattleOutcome.DRAW,
-        } satisfies Battle;
-
-        battle.opponents[testCase.idx] = opponentDetails;
-
-        instance.battle = battle;
-
-        fixture.detectChanges();
-
-        const opponentDetailsEl = (
-          await screen.findAllByTestId('opponent-details')
-        )[testCase.idx];
-
-        const opponentNameEl = getByText(
-          opponentDetailsEl,
-          opponentDetails.name,
-        );
-        expect(opponentNameEl).toBeDefined();
-      });
-
-      it('should get decorated when is a winner', async () => {
-        const fixture = MockRender(BattlePageComponent);
-        const instance = fixture.point.componentInstance;
-
-        const opponentDetails = { ...mockOpponentDetails, name: 'Tested' };
-
-        const battle = {
-          opponents: [mockOpponentDetails, mockOpponentDetails],
-          outcome: BattleOutcome.WINNER_FOUND,
-          winner: opponentDetails,
-        } satisfies Battle;
-
-        battle.opponents[testCase.idx] = opponentDetails;
-
-        instance.battle = battle;
-
-        fixture.detectChanges();
-
-        const opponentDetailsEl = (
-          await screen.findAllByTestId('opponent-details')
-        )[testCase.idx];
-
-        const winnerBadge = getByTestId(opponentDetailsEl, 'winner-badge');
-        expect(winnerBadge).toBeDefined();
-      });
-
-      it('should NOT get decorated when is not a winner', async () => {
-        const fixture = MockRender(BattlePageComponent);
-        const instance = fixture.point.componentInstance;
-
-        const opponentDetails = { ...mockOpponentDetails, name: 'Tested' };
-
-        const battle = {
-          opponents: [mockOpponentDetails, mockOpponentDetails],
-          outcome: BattleOutcome.WINNER_FOUND,
-          winner: mockOpponentDetails,
-        } satisfies Battle;
-
-        battle.opponents[testCase.idx] = opponentDetails;
-
-        instance.battle = battle;
-
-        fixture.detectChanges();
-
-        const opponentDetailsEl = (
-          await screen.findAllByTestId('opponent-details')
-        )[testCase.idx];
-
-        const winnerBadges = await queryAllByTestId(
-          opponentDetailsEl,
-          'winner-badge',
-        );
-        expect(winnerBadges.length).toEqual(0);
-      });
-
-      /* reusable detail test */
-
-      const hasText = (text: string[]) => (accessibleName: string) =>
-        text.every((text) => accessibleName.includes(text));
-
-      const shouldShowDetail = (
-        detailName: string,
-        detailLabel: string,
-        detailValue: string,
-      ) =>
-        it(`should show opponent's ${detailName}`, async () => {
-          const fixture = MockRender(BattlePageComponent);
-          const instance = fixture.point.componentInstance;
-
-          const battle = {
-            opponents: [mockOpponentDetails, mockOpponentDetails],
-            outcome: BattleOutcome.DRAW,
-          } satisfies Battle;
-
-          instance.battle = battle;
-
-          fixture.detectChanges();
-
-          const opponentDetailsEl = (
-            await screen.findAllByTestId('opponent-details')
-          )[testCase.idx];
-
-          const opponentNameEl = getByRole(opponentDetailsEl, 'row', {
-            name: hasText([detailLabel, detailValue]),
-          });
-          expect(opponentNameEl).toBeDefined();
-        });
-
-      /* detail tests */
-
-      shouldShowDetail(
-        'birth year',
-        'Birth year',
-        mockOpponentDetails.birth_year,
+      const opponentCards = ngMocks.findAll(PersonOpponentCardComponent);
+      expect(opponentCards.length).toEqual(2);
+      expect(
+        opponentCards[0].componentInstance.opponent === battle.opponents[0],
       );
-
-      shouldShowDetail('eye color', 'Eye color', mockOpponentDetails.eye_color);
-
-      shouldShowDetail(
-        'hair color',
-        'Hair color',
-        mockOpponentDetails.hair_color,
+      expect(
+        opponentCards[1].componentInstance.opponent === battle.opponents[1],
       );
+    });
 
-      shouldShowDetail('height', 'Height', mockOpponentDetails.height);
+    it('should get rendered when there are opponents (starships) on the battlefield', () => {
+      const fixture = MockRender(BattlePageComponent);
+      const instance = fixture.point.componentInstance;
 
-      shouldShowDetail('mass', 'Mass', mockOpponentDetails.mass);
+      const battle = {
+        opponents: [mockStarshipDetails, mockStarshipDetails2],
+        outcome: BattleOutcome.DRAW,
+      } satisfies Battle;
 
-      shouldShowDetail(
-        'skin color',
-        'Skin color',
-        mockOpponentDetails.skin_color,
+      instance.battle = battle;
+
+      instance.cdr.detectChanges();
+
+      const opponentCards = ngMocks.findAll(StarshipOpponentCardComponent);
+      expect(opponentCards.length).toEqual(2);
+      expect(
+        opponentCards[0].componentInstance.opponent === battle.opponents[0],
       );
-    }),
-  );
+      expect(
+        opponentCards[1].componentInstance.opponent === battle.opponents[1],
+      );
+    });
+
+    it('should mark winner when there is one', async () => {
+      const fixture = MockRender(BattlePageComponent);
+      const instance = fixture.point.componentInstance;
+
+      const battle = {
+        opponents: [mockPersonDetails, mockPersonDetails2],
+        outcome: BattleOutcome.WINNER_FOUND,
+        winner: mockPersonDetails2,
+      } satisfies Battle;
+
+      instance.battle = battle;
+
+      instance.cdr.detectChanges();
+
+      const opponentCards = ngMocks.findAll(PersonOpponentCardComponent);
+      expect(opponentCards[0].componentInstance.isWinner).toBeFalse();
+      expect(opponentCards[1].componentInstance.isWinner).toBeTrue();
+    });
+
+    it('should NOT mark winner when there is none', async () => {
+      const fixture = MockRender(BattlePageComponent);
+      const instance = fixture.point.componentInstance;
+
+      const battle = {
+        opponents: [mockPersonDetails, mockPersonDetails2],
+        outcome: BattleOutcome.DRAW,
+      } satisfies Battle;
+
+      instance.battle = battle;
+
+      instance.cdr.detectChanges();
+
+      const opponentCards = ngMocks.findAll(PersonOpponentCardComponent);
+      expect(opponentCards[0].componentInstance.isWinner).toBeFalse();
+      expect(opponentCards[1].componentInstance.isWinner).toBeFalse();
+    });
+  });
 
   describe('scoreboard', () => {
     it('should present first player`s score', () => {
@@ -275,7 +219,7 @@ describe(BattlePageComponent.name, () => {
 
       instance.score = [testedScore, 0];
 
-      fixture.detectChanges();
+      instance.cdr.detectChanges();
 
       const firstPlayerScoreEl = screen.getByTestId('score-first-player');
       expect(firstPlayerScoreEl.textContent).toContain(testedScore.toString());
@@ -289,7 +233,7 @@ describe(BattlePageComponent.name, () => {
 
       instance.score = [0, testedScore];
 
-      fixture.detectChanges();
+      instance.cdr.detectChanges();
 
       const secondPlayerScoreEl = screen.getByTestId('score-second-player');
       expect(secondPlayerScoreEl.textContent).toContain(testedScore.toString());

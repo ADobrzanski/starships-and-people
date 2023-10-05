@@ -1,94 +1,53 @@
-<ng-container *ngIf="battlefieldState$ | async as battlefieldState">
 <div class="scoreboard">
-  <span class="score score__first-player" data-testid="score-first-player">
+  <span
+    class="score score__first-player"
+    [attr.data-testid]="'score-first-player'"
+  >
     {{ score[0] }}
   </span>
-  <button
-    mat-raised-button
-    color="accent"
-    [attr.data-testid]="'button-start-battle'"
-    (click)="initBattle()"
-  >
-    Battle!
-  </button>
+
+  <div class="battle-controls">
+    <div class="battle-controls__select">
+      <mat-form-field subscriptSizing="dynamic">
+        <mat-label>Who's fighting?</mat-label>
+        <mat-select [(ngModel)]="resourceType">
+          <mat-option [value]="ResourceType.PEOPLE">People</mat-option>
+          <mat-option [value]="ResourceType.STARSHIPS">Starships</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <button
+      mat-raised-button
+      color="accent"
+      class="battle-controls__button"
+      data-testid="button-start-battle"
+      (click)="initBattle()"
+    >
+      ⚔️
+    </button>
+  </div>
+
   <span class="score score__second-player" data-testid="score-second-player">
     {{ score[1] }}
   </span>
 </div>
 
 <main class="card-container">
-  <ng-container *ngIf="battle.opponents?.[0] as opponent">
-    <ng-container
-      *ngTemplateOutlet="
-        opponentDetails;
-        context: {
-          $implicit: opponent,
-          isWinner: opponent === battle.winner
-        }
-      "
-    ></ng-container>
-  </ng-container>
-
-  <ng-container *ngIf="battle.opponents?.[1] as opponent">
-    <ng-container
-      *ngTemplateOutlet="
-        opponentDetails;
-        context: {
-          $implicit: opponent,
-          isWinner: opponent === battle.winner
-        }
-      "
-    ></ng-container>
+  <ng-container *ngFor="let opponent of battle.opponents; let i = index">
+    <app-person-opponent-card
+      *ngIf="isPersonDetails(opponent)"
+      class="card"
+      [opponent]="opponent"
+      [isWinner]="opponent === battle.winner"
+      data-testid="'opponent-details'"
+    />
+    <app-starship-opponent-card
+      *ngIf="isStarshipDetails(opponent)"
+      class="card"
+      [opponent]="opponent"
+      [isWinner]="opponent === battle.winner"
+      data-testid="opponent-details"
+    />
   </ng-container>
 </main>
-</ng-container>
-
-<ng-template #opponentDetails let-opponent let-isWinner="isWinner">
-  <mat-card
-    class="card"
-    [attr.data-testid]="'opponent-details'"
-    [appearance]="'outlined'"
-  >
-    <mat-card-header>
-      <mat-card-title>
-        <span *ngIf="isWinner" [attr.data-testid]="'winner-badge'">🥇</span>
-        {{ opponent["name"] }}
-      </mat-card-title>
-      <mat-card-subtitle>Person</mat-card-subtitle>
-    </mat-card-header>
-    <mat-card-content>
-      <table>
-        <tbody>
-          <tr>
-            <th scope="row">Birth year</th>
-            <td>{{ opponent["birth_year"] }}</td>
-          </tr>
-          <tr>
-            <th scope="row">Eye color</th>
-            <td>{{ opponent["eye_color"] }}</td>
-          </tr>
-          <tr>
-            <th scope="row">Gender</th>
-            <td>{{ opponent["gender"] }}</td>
-          </tr>
-          <tr>
-            <th scope="row">Hair color</th>
-            <td>{{ opponent["hair_color"] }}</td>
-          </tr>
-          <tr>
-            <th scope="row">Height</th>
-            <td>{{ opponent["height"] }}</td>
-          </tr>
-          <tr>
-            <th scope="row">Mass</th>
-            <td>{{ opponent["mass"] }}</td>
-          </tr>
-          <tr>
-            <th scope="row">Skin color</th>
-            <td>{{ opponent["skin_color"] }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </mat-card-content>
-  </mat-card>
-</ng-template>

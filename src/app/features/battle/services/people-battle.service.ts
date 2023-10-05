@@ -5,7 +5,7 @@ import { BattleOutcome } from '../types/battle-status.enum';
 import { ResourcesService } from './resources.service';
 
 @Injectable({ providedIn: 'root' })
-export class BattleService {
+export class PeopleBattleService {
   readonly resourcesService = inject(ResourcesService);
 
   decideOutcome(opponents: [PersonDetails, PersonDetails]): {
@@ -39,10 +39,7 @@ export class BattleService {
     ]).pipe(
       map((opponents) => {
         return {
-          opponents: opponents as [
-            Record<string, string>,
-            Record<string, string>,
-          ],
+          opponents: opponents as [PersonDetails, PersonDetails],
           ...this.decideOutcome(opponents),
         };
       }),

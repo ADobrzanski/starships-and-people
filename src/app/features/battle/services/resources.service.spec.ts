@@ -1,16 +1,20 @@
 import { MockBuilder, MockInstance } from 'ng-mocks';
 import { ResourcesService } from './resources.service';
-import { StartWarsApiService } from '@/api/start-wars-api/star-wars-api.service';
+import { StarWarsApiService } from '@/api/start-wars-api/star-wars-api.service';
 import {
   createGetPeopleResponse,
   createGetPeopleResponseEntry,
 } from '@/api/start-wars-api/mocks/get-people.mock';
 import { TestBed } from '@angular/core/testing';
 import { range } from '@/utils/range';
+import { EMPTY } from 'rxjs';
 
 describe(ResourcesService.name, () => {
   beforeEach(() =>
-    MockBuilder(ResourcesService).mock(StartWarsApiService, { export: true }),
+    MockBuilder(ResourcesService).mock(StarWarsApiService, {
+      getPeople: () => EMPTY,
+      getStarships: () => EMPTY,
+    }),
   );
 
   describe('getAllPeople', () => {
@@ -21,7 +25,7 @@ describe(ResourcesService.name, () => {
       );
 
       MockInstance(
-        StartWarsApiService,
+        StarWarsApiService,
         'getPeople',
         createGetPeopleResponse(peopleCollectionMock),
       );

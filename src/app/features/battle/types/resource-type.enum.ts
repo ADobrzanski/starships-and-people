@@ -1,4 +1,4 @@
 export enum ResourceType {
   PEOPLE = 'PEOPLE',
-  // STARSHIPS = 'STARSHIPS',
+  STARSHIPS = 'STARSHIPS',
 }
